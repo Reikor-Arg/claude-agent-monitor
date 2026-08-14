@@ -173,9 +173,26 @@ class AgentMonitorProvider {
         for (const d of subdirs) {
           const tasksPath = path.join(projectDir, d.name, 'tasks');
           try {
+            // La fecha de la carpeta no cambia cuando un archivo crece
+            // (Windows): la actividad real es el mtime más nuevo de sus
+            // archivos .output.
             const st = fs.statSync(tasksPath);
-            if (st.mtimeMs > bestMtime) {
-              bestMtime = st.mtimeMs;
+            let newest = st.mtimeMs;
+            for (const name of fs.readdirSync(tasksPath)) {
+              if (!name.endsWith('.output')) {
+                continue;
+              }
+              try {
+                const fst = fs.statSync(path.join(tasksPath, name));
+                if (fst.mtimeMs > newest) {
+                  newest = fst.mtimeMs;
+                }
+              } catch (e) {
+                continue;
+              }
+            }
+            if (newest > bestMtime) {
+              bestMtime = newest;
               bestPath = tasksPath;
             }
           } catch (e) {
@@ -218,17 +235,28 @@ class AgentMonitorProvider {
       return [this._messageItem(vscode.l10n.t('No tasks in the active session'))];
     }
 
-    const items = [];
+    const entries = [];
     for (const name of files) {
       const filePath = path.join(tasksFolder, name);
-      let st;
       try {
-        st = fs.statSync(filePath);
+        entries.push({ name, filePath, st: fs.statSync(filePath) });
       } catch (e) {
         continue;
       }
+    }
+    // Solo lo que está trabajando AHORA (actividad en los últimos 30 s),
+    // lo más reciente primero. Las tareas viejas no se muestran: para eso
+    // está el comando de abrir la carpeta.
+    entries.sort((a, b) => b.st.mtimeMs - a.st.mtimeMs);
+    const activos = entries.filter((e) => Date.now() - e.st.mtimeMs < ACTIVE_THRESHOLD_MS);
 
-      const active = Date.now() - st.mtimeMs < ACTIVE_THRESHOLD_MS;
+    if (activos.length === 0) {
+      return [this._messageItem(vscode.l10n.t('No agents working right now'))];
+    }
+
+    const items = [];
+    for (const { name, filePath, st } of activos.slice(0, 30)) {
+      const active = true;
       const relative = relativeTime(st.mtimeMs);
 
       let snippet = null;
