@@ -1,0 +1,50 @@
+{
+  "name": "agent-monitor",
+  "displayName": "%agentMonitor.displayName%",
+  "description": "%agentMonitor.description%",
+  "publisher": "teraserver",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reikor-Arg/claude-agent-monitor.git"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "agents",
+    "background-tasks",
+    "monitor"
+  ],
+  "main": "./extension.js",
+  "l10n": "./l10n",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "agentMonitorView",
+          "name": "%agentMonitor.view.name%"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "agentMonitor.refresh",
+        "title": "%agentMonitor.command.refresh%"
+      },
+      {
+        "command": "agentMonitor.openTasksFolder",
+        "title": "%agentMonitor.command.openTasksFolder%"
+      }
+    ]
+  }
+}

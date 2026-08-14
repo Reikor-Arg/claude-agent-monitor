@@ -1,0 +1,7 @@
+{
+  "agentMonitor.displayName": "Claude Agent Monitor",
+  "agentMonitor.description": "Shows Claude Code background agents and tasks for the current workspace in a sidebar view.",
+  "agentMonitor.view.name": "Claude Agents",
+  "agentMonitor.command.refresh": "Claude Agents: Refresh",
+  "agentMonitor.command.openTasksFolder": "Claude Agents: Open Tasks Folder"
+}

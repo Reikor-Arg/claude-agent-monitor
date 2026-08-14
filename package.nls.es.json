@@ -1,0 +1,7 @@
+{
+  "agentMonitor.displayName": "Claude Agent Monitor",
+  "agentMonitor.description": "Muestra los agentes y tareas en segundo plano de Claude Code para el workspace actual en una vista lateral.",
+  "agentMonitor.view.name": "Agentes Claude",
+  "agentMonitor.command.refresh": "Agentes Claude: Refrescar",
+  "agentMonitor.command.openTasksFolder": "Agentes Claude: Abrir carpeta de tareas"
+}
