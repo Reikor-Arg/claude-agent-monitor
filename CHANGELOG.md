@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Arreglado el falso positivo: una tarea que **terminó** se marcaba 🔴 igual que
+  una colgada. El `.output` cierra con `[exited with code N]`, así que ahora las
+  terminadas se descartan y 🔴 queda solo para las que dejaron de escribir sin
+  cerrar. Es la señal que faltaba y estaba en el propio archivo.
+- `test.js`: chequeo mínimo del marcador (`node test.js`).
+
 ## 0.1.0
 
 - Nuevo: **plugin de Claude Code** para terminal y app de escritorio. Reporta el

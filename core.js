@@ -51,14 +51,18 @@ function truncate(text, len) {
   return clean.length > len ? clean.slice(0, len) + '…' : clean;
 }
 
-function snippetForShellOutput(filePath, size) {
-  try {
-    const lines = readFileText(filePath, size).split('\n');
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i].trim();
-      if (line.length > 0) return truncate(line, 100);
-    }
-  } catch (e) {}
+// El runner de tareas cierra el .output con "[exited with code N]". Es la única
+// marca en disco que separa "terminó" de "colgado": sin esto, los dos se ven
+// igual (los dos dejan de escribir) y todo lo que termina queda como sospechoso.
+const EXIT_MARKER = /\[exited with code (-?\d+)\]\s*$/;
+
+function snippetForShellOutput(text) {
+  const lines = text.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line.length === 0 || EXIT_MARKER.test(line)) continue;
+    return truncate(line, 100);
+  }
   return null;
 }
 
@@ -77,20 +81,18 @@ function extractSnippetFromEvent(event) {
   return null;
 }
 
-function snippetForAgentTranscript(filePath, size) {
-  try {
-    const lines = readFileText(filePath, size).split('\n');
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i].trim();
-      if (!line) continue;
-      try {
-        const snippet = extractSnippetFromEvent(JSON.parse(line));
-        if (snippet) return snippet;
-      } catch (e) {
-        continue;
-      }
+function snippetForAgentTranscript(text) {
+  const lines = text.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    try {
+      const snippet = extractSnippetFromEvent(JSON.parse(line));
+      if (snippet) return snippet;
+    } catch (e) {
+      continue;
     }
-  } catch (e) {}
+  }
   return null;
 }
 
@@ -128,10 +130,8 @@ function findTasksFolder(workspacePath) {
   return null;
 }
 
-// ponytail: el estado sale del mtime solo. tasks/ no tiene .status ni .pid, así
-// que un agente colgado y uno terminado se ven igual — los dos dejan de
-// escribir. Por eso "stale" es candidato a colgado, no certeza. Para afinarlo
-// habría que cruzar el transcript de sesión (tool_use sin su tool_result).
+// Estado = marcador de salida + mtime. Con el marcador ya no hace falta cruzar
+// el transcript de sesión: el propio .output dice si el proceso terminó.
 function scan(workspacePath) {
   const tasksFolder = findTasksFolder(workspacePath);
   if (!tasksFolder) return { tasksFolder: null, agents: [] };
@@ -156,9 +156,17 @@ function scan(workspacePath) {
     const idleMs = now - st.mtimeMs;
     if (idleMs > IGNORE_MS) continue;
 
-    let snippet = null;
-    if (name.startsWith('a')) snippet = snippetForAgentTranscript(filePath, st.size);
-    else if (name.startsWith('b')) snippet = snippetForShellOutput(filePath, st.size);
+    let text = '';
+    try {
+      text = readFileText(filePath, st.size);
+    } catch (e) {}
+
+    // Terminada = no interesa. Lo que importa es lo que corre y lo que quedó mudo.
+    if (EXIT_MARKER.test(text.trimEnd())) continue;
+
+    const snippet = name.startsWith('a')
+      ? snippetForAgentTranscript(text)
+      : snippetForShellOutput(text);
 
     agents.push({
       id: name.replace(/\.output$/, ''),

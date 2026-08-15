@@ -38,24 +38,25 @@ Y cuando lo quieras a pedido:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.0.vsix
+code --install-extension agent-monitor-0.1.1.vsix
 ```
 
 Recargá la ventana (`Ctrl+Shift+P` → "Reload Window"). El panel **Claude Agents** aparece en el Explorador.
 
 Sin empaquetar, copiando la carpeta:
 
-- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.0\`
-- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.0/`
+- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.1\`
+- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.1/`
 
 ## Cómo lee el estado
 
 Claude Code deja la salida de cada tarea en `<temp>/claude/<proyecto>/<sesión>/tasks/*.output`. El monitor mira esos archivos:
 
 - escribió hace menos de 30 s → 🟢 trabajando
-- dejó de escribir → 🔴 con el tiempo mudo
+- dejó de escribir y **no** cerró → 🔴 con el tiempo mudo
+- cerró con `[exited with code N]` → terminó, no se muestra
 
-**Limitación conocida:** esa carpeta no dice si un proceso sigue vivo — no hay `.status` ni `.pid`. Un agente colgado y uno terminado se ven igual. Por eso 🔴 es *candidato* a colgado, no certeza.
+Ese marcador al final del archivo es lo que separa "terminó" de "colgado": sin él los dos se ven igual, porque los dos dejan de escribir.
 
 ## Por qué no cuesta tokens
 
