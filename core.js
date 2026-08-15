@@ -5,7 +5,10 @@ const path = require('path');
 const os = require('os');
 
 const ACTIVE_MS = 30 * 1000;
-const IGNORE_MS = 30 * 60 * 1000;
+// Pasado este tiempo sin escribir se deja de mostrar. Una tarea muerta sin
+// cerrar no se distingue de una colgada, así que el corte es arbitrario: lo
+// suficiente para ver el cuelgue, no tanto como para juntar basura.
+const IGNORE_MS = 10 * 60 * 1000;
 const TAIL_BYTES = 4096;
 const INLINE_READ_LIMIT_BYTES = 8192;
 

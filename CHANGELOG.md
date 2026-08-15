@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- El corte para dejar de mostrar una tarea muda baja de 30 a 10 minutos. Una
+  tarea muerta sin cerrar no se distingue de una colgada, así que quedaba media
+  hora ocupando el panel.
+
 ## 0.1.1
 
 - Arreglado el falso positivo: una tarea que **terminó** se marcaba 🔴 igual que
