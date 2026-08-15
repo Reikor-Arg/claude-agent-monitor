@@ -1,4 +1,5 @@
 node_modules/
+.orq/
 *.vsix
 .DS_Store
 Thumbs.db

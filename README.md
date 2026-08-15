@@ -1,50 +1,72 @@
 # Claude Agent Monitor
 
-A minimal, dependency-free VS Code extension that shows [Claude Code](https://claude.com/product/claude-code) background agents and tasks for the current workspace in a sidebar view.
+Muestra los agentes y tareas en segundo plano de [Claude Code](https://claude.com/product/claude-code): **cuántos hay, hace cuánto y qué están haciendo**. Sin dependencias y **sin consumir tokens**.
 
 ![screenshot](docs/screenshot.png)
 
-## What it does
+Sirve sobre todo para lo que no se ve: un agente **colgado** deja de escribir igual que uno que terminó. El monitor los marca 🔴 con el tiempo que llevan mudos.
 
-Claude Code writes the output of background shell commands and sub-agents to per-session `.output` files under its temp folder. This extension reads those files (without ever loading large ones in full) and lists them in an Explorer sidebar view called **Claude Agents**, refreshing every 2 seconds:
+## Dos formas de instalarlo, según dónde uses Claude
 
-- One entry per task/agent in the **most recent session** of the open workspace.
-- Whether it's **active** (file modified in the last 30 seconds) or finished, and a relative timestamp.
-- A short snippet of the latest activity — last output line for shell commands, or the last tool/text event for agent transcripts.
-- Click an entry to open its raw `.output` file.
-- Commands: **Claude Agents: Refresh** and **Claude Agents: Open Tasks Folder**.
+| Dónde trabajás | Qué instalás | Qué ves |
+|---|---|---|
+| Terminal / app de escritorio | **plugin de Claude Code** | una línea en pantalla en cada acción |
+| VS Code | **extensión** | panel lateral que se refresca solo |
 
-## Install (unpackaged, for development/local use)
+Los dos leen lo mismo y se pueden tener juntos.
 
-Copy this folder into your VS Code extensions directory so `package.json` sits at its root:
+### Plugin de Claude Code
 
-- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.0.1\`
-- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.0.1/`
+```
+/plugin marketplace add Reikor-Arg/claude-agent-monitor
+/plugin install agent-monitor
+```
 
-Then reload VS Code (`Ctrl+Shift+P` / `Cmd+Shift+P` → "Reload Window").
+Listo. En cada acción aparece:
 
-## Package as a .vsix (optional)
+```
+⚡ 2/3 activos · a3f2 4m Grep · b8c1 🔴 12m sin output
+```
 
-If you want a distributable package instead of a raw folder copy:
+Y cuando lo quieras a pedido:
+
+```
+/agentes
+```
+
+### Extensión de VS Code
 
 ```
 npx @vscode/vsce package
+code --install-extension agent-monitor-0.1.0.vsix
 ```
 
-This produces a `.vsix` file you can install via "Install from VSIX..." in the Extensions view.
+Recargá la ventana (`Ctrl+Shift+P` → "Reload Window"). El panel **Claude Agents** aparece en el Explorador.
 
-## Scope / Disclaimer
+Sin empaquetar, copiando la carpeta:
 
-This is an unofficial, community project — **not affiliated with or endorsed by Anthropic**. It works by reading `.output` files that Claude Code happens to leave in its OS temp folder while running background tasks. That file layout is an internal implementation detail, not a documented or stable interface: if Anthropic changes it, this view may simply show nothing until the extension is updated.
+- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.0\`
+- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.0/`
 
-## License
+## Cómo lee el estado
 
-MIT — see [LICENSE](LICENSE).
+Claude Code deja la salida de cada tarea en `<temp>/claude/<proyecto>/<sesión>/tasks/*.output`. El monitor mira esos archivos:
 
----
+- escribió hace menos de 30 s → 🟢 trabajando
+- dejó de escribir → 🔴 con el tiempo mudo
 
-## En castellano
+**Limitación conocida:** esa carpeta no dice si un proceso sigue vivo — no hay `.status` ni `.pid`. Un agente colgado y uno terminado se ven igual. Por eso 🔴 es *candidato* a colgado, no certeza.
 
-Extensión mínima de VS Code, sin dependencias, que muestra en una vista lateral los agentes y tareas en segundo plano de Claude Code para el workspace abierto. Lee los archivos `.output` que Claude Code deja en su carpeta temporal (leyendo solo la cola de los archivos grandes, nunca el archivo entero) y los lista con estado (activo/terminado), tiempo relativo y un snippet de la última actividad. Instalación: copiar la carpeta a `~/.vscode/extensions/teraserver.agent-monitor-0.0.1/` (ver rutas exactas arriba) y recargar VS Code.
+## Por qué no cuesta tokens
 
-**Aviso**: proyecto no oficial, sin afiliación con Anthropic. Lee un formato de archivos interno y no documentado de Claude Code; si ese formato cambia, la vista puede dejar de mostrar datos hasta que se actualice la extensión.
+El plugin reporta por el campo `systemMessage` de un hook `PostToolUse`: eso se muestra **al usuario** y no entra al contexto del modelo. La extensión de VS Code corre entera dentro del editor. Ninguno de los dos manda nada al modelo.
+
+En la app de escritorio y en VS Code no se puede usar la *statusline* de Claude Code — está probado, esas superficies no la ejecutan. De ahí que sean dos piezas y no una.
+
+## Alcance
+
+Proyecto no oficial, **sin afiliación con Anthropic**. Lee un formato de archivos interno y no documentado; si cambia, el monitor puede dejar de mostrar datos hasta que se actualice.
+
+## Licencia
+
+MIT — ver [LICENSE](LICENSE).

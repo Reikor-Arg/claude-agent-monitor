@@ -1,0 +1,11 @@
+{
+  "name": "agent-monitor",
+  "description": "Reporta los agentes y tareas en segundo plano de Claude Code: cuántos hay, hace cuánto y qué están haciendo. Sin tokens.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Reikor-Arg"
+  },
+  "homepage": "https://github.com/Reikor-Arg/claude-agent-monitor",
+  "keywords": ["agents", "monitor", "background-tasks"],
+  "hooks": "./hooks/hooks.json"
+}
