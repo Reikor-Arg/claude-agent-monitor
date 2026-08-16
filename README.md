@@ -67,7 +67,9 @@ Claude Code writes each task's output to `<temp>/claude/<project>/<session>/task
 - silent for 5 minutes → 🔴 `STUCK?`, sorted to the top
 - closed with `[exited with code N]` → finished, not shown
 
-A task that stopped writing without closing is **never hidden by age**. That was a real bug: a 10-minute cutoff once buried an agent that had been frozen for half an hour, which is precisely the case this tool exists for.
+That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
+
+A silent task stays listed for two hours. A ten-minute cutoff used to bury an agent that had been frozen for half an hour — precisely the case this tool exists for — so the window is generous on purpose, and dead tasks are removed at the source instead (see below).
 
 Past 2 minutes of silence the hook also tells the main agent, through `additionalContext`, in the shortest form that carries the information:
 
@@ -86,9 +88,7 @@ A task killed outright never writes its exit marker, so from disk it looks exact
 - `TaskStop` → deletes that task's `.output` the moment you kill it
 - `SessionStart` → sweeps leftovers from **other** sessions, whose processes are gone by definition
 
-Nothing is ever deleted by age. A task that's been quiet for a while may well be alive, and that's the case this tool exists for.
-
-That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
+No file is ever deleted by age. A task that's been quiet for a while may well be alive.
 
 ## Why it costs no tokens
 
