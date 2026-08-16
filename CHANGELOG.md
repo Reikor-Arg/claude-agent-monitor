@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+- The age cutoff is gone. With dead tasks removed at the source, elapsed silence
+  stopped being evidence of anything, and every cutoff tried so far buried a real
+  hang. One accepted hole remains: if the app crashes and you resume that same
+  session, its leftover `.output` has no hook to clean it.
 ## 0.1.9
 
 - Dead tasks are cleaned up instead of lingering as false `STUCK?`: a `TaskStop`

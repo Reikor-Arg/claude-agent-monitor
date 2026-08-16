@@ -5,10 +5,11 @@ const path = require('path');
 const os = require('os');
 
 const ACTIVE_MS = 30 * 1000;
-// Corte por edad. 10 min tapaba cuelgues reales (pasó: uno de media hora quedó
-// invisible). 2 h agarra cualquier cuelgue que importe; lo que muere de golpe
-// sin escribir el marcador lo limpia el hook de TaskStop, no este corte.
-const IGNORE_MS = 2 * 60 * 60 * 1000;
+// No hay corte por edad: lo muerto se borra en su origen (hooks TaskStop y
+// SessionStart), así que el tiempo dejó de ser una pista de nada. Cualquier
+// corte tapaba cuelgues reales — uno de media hora quedó invisible con 10 min.
+// Queda un solo hueco, aceptado: si la app se cae y retomás esa misma sesión,
+// su .output no lo limpia nadie.
 // Escalones de silencio. A los 2 min ya es sospechoso; a los 5 hay que mirarlo.
 const SUSPECT_MS = 2 * 60 * 1000;
 const STUCK_MS = 5 * 60 * 1000;
@@ -160,7 +161,6 @@ function scan(workspacePath) {
       continue;
     }
     const idleMs = now - st.mtimeMs;
-    if (idleMs > IGNORE_MS) continue;
 
     let text = '';
     try {

@@ -55,7 +55,7 @@ Or build it yourself:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.9.vsix
+code --install-extension agent-monitor-0.2.0.vsix
 ```
 
 ## How it reads the state
@@ -69,7 +69,7 @@ Claude Code writes each task's output to `<temp>/claude/<project>/<session>/task
 
 That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
 
-A silent task stays listed for two hours. A ten-minute cutoff used to bury an agent that had been frozen for half an hour — precisely the case this tool exists for — so the window is generous on purpose, and dead tasks are removed at the source instead (see below).
+A silent task stays listed for as long as it stays silent. There is no age cutoff at all: every cutoff tried so far buried a real hang (ten minutes once hid an agent frozen for half an hour), and dead tasks are removed at the source instead — see below.
 
 Past 2 minutes of silence the hook also tells the main agent, through `additionalContext`, in the shortest form that carries the information:
 

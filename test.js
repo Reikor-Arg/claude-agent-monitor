@@ -19,12 +19,12 @@ fs.writeFileSync(path.join(tasks, 'bcorriendo.output'), 'compilando...\n');
 fs.writeFileSync(path.join(tasks, 'bterminada.output'), 'listo\n\n[exited with code 0]\n');
 fs.writeFileSync(path.join(tasks, 'bfallada.output'), 'boom\n\n[exited with code 1]\n');
 
-// Una muda desde hace 40 min: es el caso que el monitor existe para mostrar,
-// y un corte por antiguedad la hacia desaparecer.
+// Muda desde hace 5 horas: es el caso que el monitor existe para mostrar, y
+// cualquier corte por antiguedad la hacia desaparecer justo cuando importaba.
 const vieja = path.join(tasks, 'bcolgada.output');
 fs.writeFileSync(vieja, 'esperando respuesta del servidor\n');
-const hace8min = new Date(Date.now() - 8 * 60 * 1000);
-fs.utimesSync(vieja, hace8min, hace8min);
+const hace5h = new Date(Date.now() - 5 * 60 * 60 * 1000);
+fs.utimesSync(vieja, hace5h, hace5h);
 
 const { agents } = core.scan(workspace);
 const ids = agents.map((a) => a.id).sort();
