@@ -1,10 +1,11 @@
 # Changelog
 
-## 0.1.7
+## 0.1.8
 
-- Age cutoff set to 2 hours. Removing it entirely left zombies around forever: a
-  task killed outright never writes the exit marker, so it looks identical to a
-  hung one. Two hours still catches any real hang and drops yesterday's debris.
+- Age cutoff is 10 minutes. A task killed outright never writes the exit marker,
+  so with no cutoff it stayed flagged as stuck forever. The 2 minute alert has
+  already fired by then — but note that alert rides a `PostToolUse` hook, so if
+  no tool call runs, nothing warns and the entry still disappears at 10 minutes.
 ## 0.1.6
 
 - **Fixed a real miss:** a task silent for 30 minutes had already been dropped

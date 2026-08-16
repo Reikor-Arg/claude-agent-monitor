@@ -23,8 +23,8 @@ fs.writeFileSync(path.join(tasks, 'bfallada.output'), 'boom\n\n[exited with code
 // y un corte por antiguedad la hacia desaparecer.
 const vieja = path.join(tasks, 'bcolgada.output');
 fs.writeFileSync(vieja, 'esperando respuesta del servidor\n');
-const hace40min = new Date(Date.now() - 40 * 60 * 1000);
-fs.utimesSync(vieja, hace40min, hace40min);
+const hace8min = new Date(Date.now() - 8 * 60 * 1000);
+fs.utimesSync(vieja, hace8min, hace8min);
 
 const { agents } = core.scan(workspace);
 const ids = agents.map((a) => a.id).sort();
