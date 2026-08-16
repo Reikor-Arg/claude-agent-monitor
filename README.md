@@ -55,7 +55,7 @@ Or build it yourself:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.5.vsix
+code --install-extension agent-monitor-0.1.6.vsix
 ```
 
 ## How it reads the state
@@ -63,8 +63,19 @@ code --install-extension agent-monitor-0.1.5.vsix
 Claude Code writes each task's output to `<temp>/claude/<project>/<session>/tasks/*.output`. The monitor watches those files:
 
 - wrote less than 30 s ago → 🟢 working
-- stopped writing and **didn't** close → 🔴 with how long it's been silent
+- silent for 2 minutes → 🟠 worth a look
+- silent for 5 minutes → 🔴 `STUCK?`, sorted to the top
 - closed with `[exited with code N]` → finished, not shown
+
+A task that stopped writing without closing is **never hidden by age**. That was a real bug: a 10-minute cutoff once buried an agent that had been frozen for half an hour, which is precisely the case this tool exists for.
+
+Past 2 minutes of silence the hook also tells the main agent, through `additionalContext`, in the shortest form that carries the information:
+
+```
+STUCK? b8c1 4m a3f2 12m
+```
+
+Around 10 tokens, and only when something is actually silent. It's the one place the monitor spends anything at all, and it buys the main agent the chance to check on the task or kill it.
 
 That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
 

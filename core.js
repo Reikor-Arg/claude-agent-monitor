@@ -5,10 +5,13 @@ const path = require('path');
 const os = require('os');
 
 const ACTIVE_MS = 30 * 1000;
-// Pasado este tiempo sin escribir se deja de mostrar. Una tarea muerta sin
-// cerrar no se distingue de una colgada, así que el corte es arbitrario: lo
-// suficiente para ver el cuelgue, no tanto como para juntar basura.
-const IGNORE_MS = 10 * 60 * 1000;
+// Una tarea sin cerrar NO se oculta por vieja: es justo el caso que se busca.
+// Un corte de 10 min llegó a tapar un agente trabado media hora. El límite alto
+// existe solo para que no se acumule basura de sesiones de días atrás.
+const IGNORE_MS = 24 * 60 * 60 * 1000;
+// Escalones de silencio. A los 2 min ya es sospechoso; a los 5 hay que mirarlo.
+const SUSPECT_MS = 2 * 60 * 1000;
+const STUCK_MS = 5 * 60 * 1000;
 const TAIL_BYTES = 4096;
 const INLINE_READ_LIMIT_BYTES = 8192;
 
@@ -177,19 +180,29 @@ function scan(workspacePath) {
       idleMs,
       idle: relativeTime(st.mtimeMs),
       working: idleMs < ACTIVE_MS,
+      level: idleMs >= STUCK_MS ? 'stuck' : idleMs >= SUSPECT_MS ? 'suspect' : 'ok',
       snippet
     });
   }
 
-  agents.sort((a, b) => a.idleMs - b.idleMs);
+  // Lo trabado primero: es lo que hay que mirar, y en una lista larga el que
+  // más callado está era justo el que quedaba último.
+  const rank = { stuck: 0, suspect: 1, ok: 2 };
+  agents.sort((a, b) => rank[a.level] - rank[b.level] || b.idleMs - a.idleMs);
   return { tasksFolder, agents };
+}
+
+function stateOf(agent) {
+  if (agent.level === 'stuck') return `🔴 STUCK? ${agent.idle} no output`;
+  if (agent.level === 'suspect') return `🟠 ${agent.idle} no output`;
+  return agent.working ? '🟢 writing' : `🟡 ${agent.idle} no output`;
 }
 
 function formatLine(agents) {
   if (agents.length === 0) return null;
   const parts = agents.slice(0, 4).map((a) => {
     const what = a.snippet ? ` ${truncate(a.snippet, 24)}` : '';
-    return a.working ? `${a.id} ${a.idle}${what}` : `${a.id} 🔴 ${a.idle} no output`;
+    return a.level === 'ok' && a.working ? `${a.id} ${a.idle}${what}` : `${a.id} ${stateOf(a)}`;
   });
   const working = agents.filter((a) => a.working).length;
   return `⚡ ${working}/${agents.length} running · ${parts.join(' · ')}`;
@@ -197,11 +210,12 @@ function formatLine(agents) {
 
 function formatTable(agents) {
   if (agents.length === 0) return 'No agents.';
-  const rows = agents.map((a) => {
-    const estado = a.working ? '🟢 writing' : `🔴 ${a.idle} no output`;
-    return `  ${a.id.padEnd(12)} ${a.idle.padStart(5)}  ${estado.padEnd(22)} ${a.snippet || ''}`.trimEnd();
-  });
-  return [`AGENTS (${agents.length})`, ...rows].join('\n');
+  const rows = agents.map(
+    (a) => `  ${a.id.padEnd(12)} ${a.idle.padStart(5)}  ${stateOf(a).padEnd(26)} ${a.snippet || ''}`.trimEnd()
+  );
+  const stuck = agents.filter((a) => a.level === 'stuck').length;
+  const head = stuck > 0 ? `AGENTS (${agents.length}) — ${stuck} possibly stuck` : `AGENTS (${agents.length})`;
+  return [head, ...rows].join('\n');
 }
 
 module.exports = { scan, formatLine, formatTable, findTasksFolder, getSlug, relativeTime, truncate };

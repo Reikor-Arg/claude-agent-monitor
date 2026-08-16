@@ -1,7 +1,7 @@
 {
   "name": "agent-monitor",
   "description": "Reports Claude Code background agents and tasks: how many are running, for how long, and what they are doing. Costs no tokens.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": {
     "name": "Reikor-Arg"
   },
