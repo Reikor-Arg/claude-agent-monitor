@@ -30,10 +30,10 @@ process.stdin.on('end', () => {
   const line = formatLine(agents);
   if (!line) process.exit(0);
 
-  // Los mudos hace rato. El aviso va con id y tiempo y nada más: el agente
-  // principal ya sabe qué lanzó, no hace falta describirle la tarea.
+  // Solo los ids. El tiempo y el detalle ya están en el panel; acá cada palabra
+  // se paga en cada turno del agente principal.
   const mudos = agents.filter((a) => a.level !== 'ok');
-  const aviso = mudos.length ? `STUCK? ${mudos.map((a) => `${a.id} ${a.idle}`).join(' ')}` : '';
+  const aviso = mudos.length ? `STUCK? ${mudos.map((a) => a.id).join(' ')}` : '';
 
   const stateFile = path.join(os.tmpdir(), `agent-monitor-${sessionId}.last`);
   const huella = `${line}||${aviso}`;

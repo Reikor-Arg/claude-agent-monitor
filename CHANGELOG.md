@@ -7,7 +7,7 @@
   tasks are no longer hidden by age — that is the case the monitor exists for.
 - Silence now escalates: 🟠 at 2 minutes, 🔴 STUCK? at 5. Stuck ones sort first.
 - The hook tells the main agent through `additionalContext` when something has
-  been silent for 2+ minutes — just the id and the elapsed time, about 10 tokens,
+  been silent for 2+ minutes — just the ids, about 8 tokens,
   and only when there is something wrong.
 
 ## 0.1.5

@@ -72,10 +72,10 @@ A task that stopped writing without closing is **never hidden by age**. That was
 Past 2 minutes of silence the hook also tells the main agent, through `additionalContext`, in the shortest form that carries the information:
 
 ```
-STUCK? b8c1 4m a3f2 12m
+STUCK? b8c1 a3f2
 ```
 
-Around 10 tokens, and only when something is actually silent. It's the one place the monitor spends anything at all, and it buys the main agent the chance to check on the task or kill it.
+Just the ids — the elapsed time is already in the panel, and every word here is paid for on every turn. Around 8 tokens, and only when something is actually silent. It's the one place the monitor spends anything at all, and it buys the main agent the chance to check on the task or kill it.
 
 That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
 
