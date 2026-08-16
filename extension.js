@@ -54,11 +54,14 @@ class AgentMonitorProvider {
     // escribir igual que uno que terminó, y ocultarlos era perder justo la señal
     // que se busca.
     return result.agents.slice(0, 30).map((a) => {
-      const snippet = a.snippet || vscode.l10n.t('No agents working right now');
+      // Sin snippet solo se muestra el tiempo: meter acá el texto de "no hay
+      // agentes" hacía que una tarea recién arrancada dijera justo lo contrario
+      // de lo que estaba pasando.
+      const detail = a.working ? (a.snippet ? `${a.idle} — ${a.snippet}` : a.idle) : `🔴 ${a.idle} sin output`;
       const item = new vscode.TreeItem(a.id, vscode.TreeItemCollapsibleState.None);
-      item.description = a.working ? `${a.idle} — ${snippet}` : `🔴 ${a.idle} sin output`;
+      item.description = detail;
       item.iconPath = new vscode.ThemeIcon(a.working ? 'sync~spin' : 'warning');
-      item.tooltip = `${a.id}\n${a.idle}\n${snippet}`;
+      item.tooltip = `${a.id}\n${detail}`;
       item.command = {
         command: 'vscode.open',
         title: 'Open',

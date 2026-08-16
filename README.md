@@ -38,15 +38,15 @@ Y cuando lo quieras a pedido:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.2.vsix
+code --install-extension agent-monitor-0.1.3.vsix
 ```
 
 Recargá la ventana (`Ctrl+Shift+P` → "Reload Window"). El panel **Claude Agents** aparece en el Explorador.
 
 Sin empaquetar, copiando la carpeta:
 
-- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.2\`
-- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.2/`
+- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.3\`
+- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.3/`
 
 ## Cómo lee el estado
 

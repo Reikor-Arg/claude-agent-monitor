@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3
+
+- Arreglado: una tarea recién arrancada, todavía sin salida que mostrar, decía
+  "No agents working right now" — exactamente lo contrario de lo que pasaba.
+  Ahora muestra solo el tiempo.
+- Screenshot real del panel en el README.
+
 ## 0.1.2
 
 - El corte para dejar de mostrar una tarea muda baja de 30 a 10 minutos. Una
