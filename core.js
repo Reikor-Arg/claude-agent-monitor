@@ -204,7 +204,7 @@ function formatTable(agents) {
   return [`AGENTES (${agents.length})`, ...rows].join('\n');
 }
 
-module.exports = { scan, formatLine, formatTable, findTasksFolder, getSlug, relativeTime };
+module.exports = { scan, formatLine, formatTable, findTasksFolder, getSlug, relativeTime, truncate };
 
 if (require.main === module) {
   const cwd = process.argv[3] || process.cwd();

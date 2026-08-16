@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- El panel muestra **lo que hace el agente** como texto principal y el tiempo al
+  costado. Antes el texto principal era el id (`b01x4494x`), que no dice nada, y
+  lo único útil quedaba recortado por el ancho del panel.
+
 ## 0.1.3
 
 - Arreglado: una tarea recién arrancada, todavía sin salida que mostrar, decía
