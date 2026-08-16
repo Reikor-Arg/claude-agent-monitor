@@ -2,7 +2,7 @@
 
 Muestra los agentes y tareas en segundo plano de [Claude Code](https://claude.com/product/claude-code): **cuántos hay, hace cuánto y qué están haciendo**. Sin dependencias y **sin consumir tokens**.
 
-![screenshot](docs/screenshot.png)
+![Panel Claude Agents en VS Code](docs/screenshot-vscode.png)
 
 Sirve sobre todo para lo que no se ve: un agente **colgado** deja de escribir igual que uno que terminó. El monitor los marca 🔴 con el tiempo que llevan mudos.
 
