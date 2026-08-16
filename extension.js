@@ -58,7 +58,7 @@ class AgentMonitorProvider {
       // el panel es angosto y recortaba justo lo único que interesa, dejando a
       // la vista un id que no dice nada.
       const label = a.snippet ? core.truncate(a.snippet, 40) : a.id;
-      const detail = a.working ? a.idle : `🔴 ${a.idle} sin output`;
+      const detail = a.working ? a.idle : `🔴 ${a.idle} no output`;
       const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None);
       item.description = detail;
       item.iconPath = new vscode.ThemeIcon(a.working ? 'sync~spin' : 'warning');

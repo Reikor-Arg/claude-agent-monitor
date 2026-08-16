@@ -1,7 +1,7 @@
 {
   "name": "agent-monitor",
-  "description": "Reporta los agentes y tareas en segundo plano de Claude Code: cuántos hay, hace cuánto y qué están haciendo. Sin tokens.",
-  "version": "0.1.4",
+  "description": "Reports Claude Code background agents and tasks: how many are running, for how long, and what they are doing. Costs no tokens.",
+  "version": "0.1.5",
   "author": {
     "name": "Reikor-Arg"
   },

@@ -1,73 +1,83 @@
 # Claude Agent Monitor
 
-Muestra los agentes y tareas en segundo plano de [Claude Code](https://claude.com/product/claude-code): **cuántos hay, hace cuánto y qué están haciendo**. Sin dependencias y **sin consumir tokens**.
+Shows [Claude Code](https://claude.com/product/claude-code) background agents and tasks: **how many are running, for how long, and what they are doing**. No dependencies, and **it costs no tokens**.
 
-![Panel Claude Agents en VS Code](docs/screenshot-vscode.png)
+![Claude Agents panel in VS Code](docs/screenshot-vscode.png)
 
-Sirve sobre todo para lo que no se ve: un agente **colgado** deja de escribir igual que uno que terminó. El monitor los marca 🔴 con el tiempo que llevan mudos.
+It exists for the case you can't see otherwise: a **hung** agent stops writing exactly like one that finished. The monitor flags those 🔴 with how long they've been silent.
 
-## Dos formas de instalarlo, según dónde uses Claude
+## Two ways to install it, depending on where you use Claude
 
-| Dónde trabajás | Qué instalás | Qué ves |
+| Where you work | What you install | What you get |
 |---|---|---|
-| Terminal / app de escritorio | **plugin de Claude Code** | una línea en pantalla en cada acción |
-| VS Code | **extensión** | panel lateral que se refresca solo |
+| Terminal / desktop app | **Claude Code plugin** | one status line on every action |
+| VS Code | **extension** | a sidebar panel that refreshes itself |
 
-Los dos leen lo mismo y se pueden tener juntos.
+Both read the same files and can be used together.
 
-### Plugin de Claude Code
+### Claude Code plugin
 
 ```
 /plugin marketplace add Reikor-Arg/claude-agent-monitor
 /plugin install agent-monitor
 ```
 
-Listo. En cada acción aparece:
+On every action you get:
 
 ```
-⚡ 2/3 activos · a3f2 4m Grep · b8c1 🔴 12m sin output
+⚡ 2/3 running · a3f2 4m Grep · b8c1 🔴 12m no output
 ```
 
-Y cuando lo quieras a pedido:
+And on demand:
 
 ```
 /agentes
 ```
 
-### Extensión de VS Code
+**Heads up:** `/plugin` currently exists only in the terminal CLI. In the desktop app and the VS Code extension it answers `/plugin isn't available in this environment`. There, add it to `~/.claude/settings.json` by hand:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "agent-monitor": { "source": { "source": "github", "repo": "Reikor-Arg/claude-agent-monitor" } }
+  },
+  "enabledPlugins": {
+    "agent-monitor@agent-monitor": true
+  }
+}
+```
+
+### VS Code extension
+
+Download `agent-monitor-<version>.vsix` from [Releases](https://github.com/Reikor-Arg/claude-agent-monitor/releases), then `Ctrl+Shift+P` → *Extensions: Install from VSIX…* → Reload Window. The **Claude Agents** panel shows up in the Explorer.
+
+Or build it yourself:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.4.vsix
+code --install-extension agent-monitor-0.1.5.vsix
 ```
 
-Recargá la ventana (`Ctrl+Shift+P` → "Reload Window"). El panel **Claude Agents** aparece en el Explorador.
+## How it reads the state
 
-Sin empaquetar, copiando la carpeta:
+Claude Code writes each task's output to `<temp>/claude/<project>/<session>/tasks/*.output`. The monitor watches those files:
 
-- Windows: `%USERPROFILE%\.vscode\extensions\teraserver.agent-monitor-0.1.4\`
-- macOS/Linux: `~/.vscode/extensions/teraserver.agent-monitor-0.1.4/`
+- wrote less than 30 s ago → 🟢 working
+- stopped writing and **didn't** close → 🔴 with how long it's been silent
+- closed with `[exited with code N]` → finished, not shown
 
-## Cómo lee el estado
+That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
 
-Claude Code deja la salida de cada tarea en `<temp>/claude/<proyecto>/<sesión>/tasks/*.output`. El monitor mira esos archivos:
+## Why it costs no tokens
 
-- escribió hace menos de 30 s → 🟢 trabajando
-- dejó de escribir y **no** cerró → 🔴 con el tiempo mudo
-- cerró con `[exited with code N]` → terminó, no se muestra
+The plugin reports through the `systemMessage` field of a `PostToolUse` hook: that is shown **to the user** and never enters the model's context. The VS Code extension runs entirely inside the editor. Neither sends anything to the model.
 
-Ese marcador al final del archivo es lo que separa "terminó" de "colgado": sin él los dos se ven igual, porque los dos dejan de escribir.
+Claude Code's *statusline* can't be used here — it's measured: neither the desktop app nor the VS Code extension ever executes it. That's why this is two pieces instead of one.
 
-## Por qué no cuesta tokens
+## Scope
 
-El plugin reporta por el campo `systemMessage` de un hook `PostToolUse`: eso se muestra **al usuario** y no entra al contexto del modelo. La extensión de VS Code corre entera dentro del editor. Ninguno de los dos manda nada al modelo.
+Unofficial project, **not affiliated with or endorsed by Anthropic**. It reads an internal, undocumented file layout; if that changes, the monitor may stop showing data until it's updated.
 
-En la app de escritorio y en VS Code no se puede usar la *statusline* de Claude Code — está probado, esas superficies no la ejecutan. De ahí que sean dos piezas y no una.
+## License
 
-## Alcance
-
-Proyecto no oficial, **sin afiliación con Anthropic**. Lee un formato de archivos interno y no documentado; si cambia, el monitor puede dejar de mostrar datos hasta que se actualice.
-
-## Licencia
-
-MIT — ver [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

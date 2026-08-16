@@ -1,42 +1,47 @@
 # Changelog
 
+## 0.1.5
+
+- Everything user-facing is in English now: README, plugin description, `/agentes`
+  output and the panel labels.
+
 ## 0.1.4
 
-- El panel muestra **lo que hace el agente** como texto principal y el tiempo al
-  costado. Antes el texto principal era el id (`b01x4494x`), que no dice nada, y
-  lo único útil quedaba recortado por el ancho del panel.
+- The panel shows **what the agent is doing** as the main text, with the time on
+  the side. It used to show the id (`b01x4494x`), which says nothing, and the
+  only useful part got cut off by the panel width.
 
 ## 0.1.3
 
-- Arreglado: una tarea recién arrancada, todavía sin salida que mostrar, decía
-  "No agents working right now" — exactamente lo contrario de lo que pasaba.
-  Ahora muestra solo el tiempo.
-- Screenshot real del panel en el README.
+- Fixed: a task that had just started, with no output to show yet, said
+  "No agents working right now" — the exact opposite of what was happening.
+  Now it shows only the elapsed time.
+- Real screenshot of the panel in the README.
 
 ## 0.1.2
 
-- El corte para dejar de mostrar una tarea muda baja de 30 a 10 minutos. Una
-  tarea muerta sin cerrar no se distingue de una colgada, así que quedaba media
-  hora ocupando el panel.
+- The cutoff for hiding a silent task drops from 30 to 10 minutes. A task that
+  died without closing can't be told apart from a hung one, so it was sitting in
+  the panel for half an hour.
 
 ## 0.1.1
 
-- Arreglado el falso positivo: una tarea que **terminó** se marcaba 🔴 igual que
-  una colgada. El `.output` cierra con `[exited with code N]`, así que ahora las
-  terminadas se descartan y 🔴 queda solo para las que dejaron de escribir sin
-  cerrar. Es la señal que faltaba y estaba en el propio archivo.
-- `test.js`: chequeo mínimo del marcador (`node test.js`).
+- Fixed the false positive: a task that **finished** was flagged 🔴 just like a
+  hung one. The `.output` file closes with `[exited with code N]`, so finished
+  tasks are now dropped and 🔴 is left for the ones that stopped writing without
+  closing. That was the missing signal, and it was inside the file all along.
+- `test.js`: minimal check of the marker (`node test.js`).
 
 ## 0.1.0
 
-- Nuevo: **plugin de Claude Code** para terminal y app de escritorio. Reporta el
-  estado en cada acción vía `systemMessage` de un hook `PostToolUse` — se muestra
-  al usuario y no entra al contexto del modelo, así que no consume tokens.
-- Nuevo: comando `/agentes`, muestra la tabla completa a pedido.
-- La lógica de lectura se movió a `core.js`, compartido por la extensión y el
-  plugin.
-- Las tareas que dejaron de escribir ya no se ocultan: se marcan 🔴 con el tiempo
-  que llevan sin salida. Ocultarlas escondía justo la señal de un agente colgado.
+- New: **Claude Code plugin** for the terminal and the desktop app. Reports state
+  on every action through the `systemMessage` field of a `PostToolUse` hook — it
+  is shown to the user and never enters the model's context, so it costs no
+  tokens.
+- New: `/agentes` command, shows the full table on demand.
+- Reading logic moved to `core.js`, shared by the extension and the plugin.
+- Tasks that stopped writing are no longer hidden: they're flagged 🔴 with how
+  long they've been silent. Hiding them hid exactly the signal of a hung agent.
 
 ## 0.0.1
 

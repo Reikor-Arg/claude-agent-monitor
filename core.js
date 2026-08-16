@@ -189,19 +189,19 @@ function formatLine(agents) {
   if (agents.length === 0) return null;
   const parts = agents.slice(0, 4).map((a) => {
     const what = a.snippet ? ` ${truncate(a.snippet, 24)}` : '';
-    return a.working ? `${a.id} ${a.idle}${what}` : `${a.id} 🔴 ${a.idle} sin output`;
+    return a.working ? `${a.id} ${a.idle}${what}` : `${a.id} 🔴 ${a.idle} no output`;
   });
   const working = agents.filter((a) => a.working).length;
-  return `⚡ ${working}/${agents.length} activos · ${parts.join(' · ')}`;
+  return `⚡ ${working}/${agents.length} running · ${parts.join(' · ')}`;
 }
 
 function formatTable(agents) {
-  if (agents.length === 0) return 'Sin agentes.';
+  if (agents.length === 0) return 'No agents.';
   const rows = agents.map((a) => {
-    const estado = a.working ? '🟢 escribiendo' : `🔴 ${a.idle} sin output`;
+    const estado = a.working ? '🟢 writing' : `🔴 ${a.idle} no output`;
     return `  ${a.id.padEnd(12)} ${a.idle.padStart(5)}  ${estado.padEnd(22)} ${a.snippet || ''}`.trimEnd();
   });
-  return [`AGENTES (${agents.length})`, ...rows].join('\n');
+  return [`AGENTS (${agents.length})`, ...rows].join('\n');
 }
 
 module.exports = { scan, formatLine, formatTable, findTasksFolder, getSlug, relativeTime, truncate };
