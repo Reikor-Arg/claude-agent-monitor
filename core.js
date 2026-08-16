@@ -5,12 +5,10 @@ const path = require('path');
 const os = require('os');
 
 const ACTIVE_MS = 30 * 1000;
-// Corte por edad. Sin corte, una tarea muerta de golpe (nunca escribe el
-// marcador de salida) queda marcada como colgada para siempre. Con el aviso a
-// los 2 min ya hubo tiempo de enterarse, así que 10 min alcanza.
-// Ojo: ese aviso viaja en un hook PostToolUse. Si no corre ninguna tool call,
-// no avisa nada y a los 10 min la entrada desaparece igual.
-const IGNORE_MS = 10 * 60 * 1000;
+// Corte por edad. 10 min tapaba cuelgues reales (pasó: uno de media hora quedó
+// invisible). 2 h agarra cualquier cuelgue que importe; lo que muere de golpe
+// sin escribir el marcador lo limpia el hook de TaskStop, no este corte.
+const IGNORE_MS = 2 * 60 * 60 * 1000;
 // Escalones de silencio. A los 2 min ya es sospechoso; a los 5 hay que mirarlo.
 const SUSPECT_MS = 2 * 60 * 1000;
 const STUCK_MS = 5 * 60 * 1000;

@@ -15,7 +15,7 @@ process.stdin.on('end', () => {
   let cwd = process.cwd();
   let sessionId = 'default';
   try {
-    const payload = JSON.parse(input);
+    const payload = JSON.parse(input.replace(/^\uFEFF/, ''));
     if (payload.cwd) cwd = payload.cwd;
     if (payload.session_id) sessionId = payload.session_id;
   } catch (e) {}
@@ -33,7 +33,8 @@ process.stdin.on('end', () => {
   // Solo los ids. El tiempo y el detalle ya están en el panel; acá cada palabra
   // se paga en cada turno del agente principal.
   const mudos = agents.filter((a) => a.level !== 'ok');
-  const aviso = mudos.length ? `STUCK? ${mudos.map((a) => a.id).join(' ')}` : '';
+  // Sin la orden al final el aviso se lee y se ignora: informa pero no pide nada.
+  const aviso = mudos.length ? `STUCK? ${mudos.map((a) => a.id).join(' ')} - check tail, then kill or wait` : '';
 
   const stateFile = path.join(os.tmpdir(), `agent-monitor-${sessionId}.last`);
   const huella = `${line}||${aviso}`;

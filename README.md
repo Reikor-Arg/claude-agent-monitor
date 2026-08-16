@@ -55,7 +55,7 @@ Or build it yourself:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.8.vsix
+code --install-extension agent-monitor-0.1.9.vsix
 ```
 
 ## How it reads the state
@@ -75,7 +75,18 @@ Past 2 minutes of silence the hook also tells the main agent, through `additiona
 STUCK? b8c1 a3f2
 ```
 
-Just the ids — the elapsed time is already in the panel, and every word here is paid for on every turn. Around 8 tokens, and only when something is actually silent. It's the one place the monitor spends anything at all, and it buys the main agent the chance to check on the task or kill it.
+Just the ids plus what to do about them — the elapsed time is already in the panel, and every word here is paid for on every turn. Around 12 tokens, and only when something is actually silent. It's the one place the monitor spends anything at all.
+
+The trailing instruction matters: an alert that only reports gets read and ignored. With it, the agent goes and looks at the tail of that task's output and decides — a long build can be silent and perfectly healthy, a frozen one can't.
+
+## Cleaning up dead tasks
+
+A task killed outright never writes its exit marker, so from disk it looks exactly like a hung one and would stay flagged forever. Two hooks remove those, and both only fire where death is certain:
+
+- `TaskStop` → deletes that task's `.output` the moment you kill it
+- `SessionStart` → sweeps leftovers from **other** sessions, whose processes are gone by definition
+
+Nothing is ever deleted by age. A task that's been quiet for a while may well be alive, and that's the case this tool exists for.
 
 That marker at the end of the file is what separates "finished" from "hung": without it both look identical, because both stop writing.
 

@@ -1,11 +1,14 @@
 # Changelog
 
-## 0.1.8
+## 0.1.9
 
-- Age cutoff is 10 minutes. A task killed outright never writes the exit marker,
-  so with no cutoff it stayed flagged as stuck forever. The 2 minute alert has
-  already fired by then — but note that alert rides a `PostToolUse` hook, so if
-  no tool call runs, nothing warns and the entry still disappears at 10 minutes.
+- Dead tasks are cleaned up instead of lingering as false `STUCK?`: a `TaskStop`
+  hook removes the `.output` of a task you kill, and a `SessionStart` hook sweeps
+  leftovers from other sessions. Never by age — a quiet task may still be alive.
+- Age cutoff back to 2 hours, now that zombies are removed at the source. Ten
+  minutes was hiding real hangs.
+- The alert to the main agent ends in `check tail, then kill or wait`. Without an
+  instruction it was read and ignored.
 ## 0.1.6
 
 - **Fixed a real miss:** a task silent for 30 minutes had already been dropped
