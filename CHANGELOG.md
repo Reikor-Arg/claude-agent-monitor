@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7
+
+- Age cutoff set to 2 hours. Removing it entirely left zombies around forever: a
+  task killed outright never writes the exit marker, so it looks identical to a
+  hung one. Two hours still catches any real hang and drops yesterday's debris.
 ## 0.1.6
 
 - **Fixed a real miss:** a task silent for 30 minutes had already been dropped

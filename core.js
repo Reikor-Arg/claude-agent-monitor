@@ -5,10 +5,11 @@ const path = require('path');
 const os = require('os');
 
 const ACTIVE_MS = 30 * 1000;
-// Una tarea sin cerrar NO se oculta por vieja: es justo el caso que se busca.
-// Un corte de 10 min llegó a tapar un agente trabado media hora. El límite alto
-// existe solo para que no se acumule basura de sesiones de días atrás.
-const IGNORE_MS = 24 * 60 * 60 * 1000;
+// Corte por edad. Un corte de 10 min llegó a tapar un agente trabado media
+// hora; 24 h dejaba zombis de ayer para siempre (una tarea que muere de golpe
+// no escribe el marcador, así que es indistinguible de una colgada). 2 h agarra
+// cualquier cuelgue real y no arrastra basura de la sesión anterior.
+const IGNORE_MS = 2 * 60 * 60 * 1000;
 // Escalones de silencio. A los 2 min ya es sospechoso; a los 5 hay que mirarlo.
 const SUSPECT_MS = 2 * 60 * 1000;
 const STUCK_MS = 5 * 60 * 1000;

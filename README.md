@@ -55,7 +55,7 @@ Or build it yourself:
 
 ```
 npx @vscode/vsce package
-code --install-extension agent-monitor-0.1.6.vsix
+code --install-extension agent-monitor-0.1.7.vsix
 ```
 
 ## How it reads the state
